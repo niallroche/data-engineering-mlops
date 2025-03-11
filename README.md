@@ -16,6 +16,8 @@ The project is organized into the following key directories and files:
 ```
 ├── model
 │   └── train_model.py         # Train and save the logistic regression model
+│   └── test_model.py          # Unit tests for the model
+│   └── logistic_model.pkl     # trained logistic regression model (needs to be trained first)
 ├── api
 │   ├── app.py                 # Flask API to serve predictions and log data to PostgreSQL
 │   └── test_app.py            # Unit tests for the API
@@ -28,7 +30,7 @@ The project is organized into the following key directories and files:
 ├── requirements.txt           # Python dependencies
 └── .github
 └── workflows
-└── deploy.yml         # GitHub Actions workflows for deploying to cloud environment like GCP (Cloud Run) or AWS
+└── deploy.yml                 # GitHub Actions workflows for deploying to cloud environment like GCP (Cloud Run) or AWS
 ```
 ## Setup Instructions
 clone this repository

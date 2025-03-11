@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ML Prediction Form</title>
+</head>
+<body>
+    <h1>Enter Features for Prediction</h1>
+    <form id="predict-form">
+        <label>Feature 1: <input type="number" step="any" id="f1" name="f1" required></label><br>
+        <label>Feature 2: <input type="number" step="any" id="f2" name="f2" required></label><br>
+        <label>Feature 3: <input type="number" step="any" id="f3" name="f3" required></label><br>
+        <label>Feature 4: <input type="number" step="any" id="f4" name="f4" required></label><br>
+        <button type="submit">Predict</button>
+    </form>
+    <h2>Result:</h2>
+    <div id="result"></div>
+    <script>
+        document.getElementById('predict-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const features = [
+                parseFloat(document.getElementById('f1').value),
+                parseFloat(document.getElementById('f2').value),
+                parseFloat(document.getElementById('f3').value),
+                parseFloat(document.getElementById('f4').value)
+            ];
+            fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ features: features })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').innerText = 'Prediction: ' + data.prediction;
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

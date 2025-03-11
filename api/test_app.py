@@ -20,7 +20,10 @@ class TestAPI(unittest.TestCase):
     @patch('requests.post')  # Fix: mock the requests module directly
     def test_predict_endpoint(self, mock_post):
         # Mock the model service response
-        mock_post.return_value.json.return_value = {"prediction": 1}
+        mock_post.return_value.json.return_value = {
+            "prediction": 1,
+            "confidence": 0.95
+        }
         mock_post.return_value.status_code = 200
 
         test_data = {
@@ -29,9 +32,14 @@ class TestAPI(unittest.TestCase):
         response = self.app.post('/predict',
                                data=json.dumps(test_data),
                                content_type='application/json')
+        
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertIn('prediction', data)
+        self.assertIn('confidence', data)
+        self.assertIsInstance(data['prediction'], int)
+        self.assertIsInstance(data['confidence'], float)
+        self.assertTrue(0 <= data['confidence'] <= 1)
 
 if __name__ == '__main__':
     unittest.main()

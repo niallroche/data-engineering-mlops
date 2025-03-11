@@ -3,6 +3,8 @@ import joblib
 import psycopg2
 import json
 import os
+import time
+import numpy as np
 
 app = Flask(__name__, static_folder="../static")
 
@@ -36,11 +38,22 @@ def get_db_connection():
 
 @app.route('/predict', methods=['POST'])
 def predict():
+    start_time = time.time()
     try:
         data = request.get_json(force=True)
         features = data.get("features")
+        
+        # Get prediction and probability
         prediction = model.predict([features])
-        response = {"prediction": int(prediction[0])}
+        probabilities = model.predict_proba([features])
+        confidence = float(np.max(probabilities[0]))  # Get the highest probability
+        
+        response = {
+            "prediction": int(prediction[0]),
+            "confidence": confidence
+        }
+        
+        processing_time = time.time() - start_time
 
         # Log the request and prediction in the database
         if USE_DATABASE:
@@ -48,8 +61,17 @@ def predict():
             if conn:
                 try:
                     cur = conn.cursor()
-                    insert_query = "INSERT INTO api_logs (input_data, prediction) VALUES (%s, %s)"
-                    cur.execute(insert_query, (json.dumps(data), int(prediction[0])))
+                    insert_query = """
+                        INSERT INTO prediction_logs 
+                        (input_features, prediction, timestamp, processing_time, confidence) 
+                        VALUES (%s, %s, CURRENT_TIMESTAMP, %s, %s)
+                    """
+                    cur.execute(insert_query, (
+                        json.dumps(data), 
+                        int(prediction[0]),
+                        float(processing_time),
+                        confidence
+                    ))
                     cur.close()
                     conn.close()
                 except Exception as e:

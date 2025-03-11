@@ -4,7 +4,7 @@ services:
     build: .
     environment:
 
-      - USE_DATABASE=false  # Can be set to 'true' to enable database logging
+      - USE_DATABASE=true  # Can be set to 'true' to enable database logging
       - POSTGRES_DB=flask_logs
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=your_password

@@ -197,6 +197,33 @@ CREATE DATABASE flask_logs;
 \i db/init.sql
 ```
 
+2. Connect to PostgreSQL in Docker:
+```bash
+# find the container id running PostgreSQL
+docker ps
+
+# connect to the container
+docker exec -it <container_id>
+
+# connect to the database
+psql -U postgres -d flask_logs
+
+# list the database tables
+\dt
+
+# select recordfrom the table
+select * from prediction_logs;
+
+# exit the database
+\q
+
+```
+
+if the database needs to be created first, execute the following command when logged in to the container
+```bash
+psql -U postgres -d flask_logs -f /docker-entrypoint-initdb.d/init.sql
+```
+
 ### Environment Variables
 Configure the following environment variables for database connection:
 ```bash

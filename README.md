@@ -92,7 +92,7 @@ python -m unittest model/test_model.py
 
 ### 2. Build the Docker image:
 - Navigate to the root directory of the project.
-- Run the following command to build the Docker image.
+- Run the following command to build the Docker image. (Note that this command might require admin rights such as sudo)
 
 ```bash
 docker-compose build
@@ -221,6 +221,25 @@ SELECT pg_size_pretty(pg_database_size('flask_logs'));
 
 ## Running the Application
 ...
+
+
+publish the image to a container registry 
+- (to a GCP registry)
+```bash
+docker tag data-engineering-mlops:latest gcr.io/data-engineering-mlops/data-engineering-mlops:latest
+docker push gcr.io/data-engineering-mlops/data-engineering-mlops:latest
+```
+- (to an AWS registry) change the tag to your own aws account id
+```bash
+docker tag data-engineering-mlops:latest 123456789012.dkr.ecr.us-east-1.amazonaws.com/data-engineering-mlops:latest
+docker push 123456789012.dkr.ecr.us-east-1.amazonaws.com/data-engineering-mlops:latest
+```
+
+- to docker hub
+```bash
+docker tag data-engineering-mlops:latest niallroche/data-engineering-mlops:latest
+docker push niallroche/data-engineering-mlops:latest
+```
 
 ## How to Deploy to Cloud Platform
 

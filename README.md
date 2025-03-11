@@ -13,7 +13,7 @@ This project is a simple end-to-end system built for Data Engineering students. 
 ## Project Structure
 
 The project is organized into the following key directories and files:
-
+```
 ├── model
 │   └── train_model.py         # Train and save the logistic regression model
 ├── api
@@ -29,7 +29,7 @@ The project is organized into the following key directories and files:
 └── .github
 └── workflows
 └── deploy.yml         # GitHub Actions workflows for deploying to cloud environment like GCP (Cloud Run) or AWS
-
+```
 ## Setup Instructions
 clone this repository
 

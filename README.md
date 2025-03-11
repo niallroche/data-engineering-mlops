@@ -29,9 +29,10 @@ The project is organized into the following key directories and files:
 ├── docker-compose.yml         # Docker Compose configuration (starts API and PostgreSQL containers)
 ├── requirements.txt           # Python dependencies
 └── .github
-└── workflows
-└── deploy.yml                 # GitHub Actions workflows for deploying to cloud environment like GCP (Cloud Run) or AWS
+│    └── workflows
+│       └── deploy.yml                 # GitHub Actions workflows for deploying to cloud 
 ```
+
 ## Setup Instructions
 clone this repository
 
@@ -99,10 +100,14 @@ docker-compose build
 
 ### 3. Start the API
 - Navigate to the root directory of the project.
-- Run the following command to start the API and PostgreSQL containers.
+- Run the following command to start the API and optionally the PostgreSQL containers.
 
 ```bash
 docker-compose up -d
+```
+- to run the server locally outside of docker run the following in a dedicated terminal window
+```bash
+python3 api/app.py
 ```
 
 ### 4. Run Unit Test

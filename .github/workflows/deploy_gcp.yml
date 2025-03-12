@@ -14,16 +14,16 @@ jobs:
         uses: google-github-actions/setup-gcloud@master
         with:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
-          project_id: your-gcp-project-id
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Build the Docker image
         run: |
-          docker build -t gcr.io/your-gcp-project-id/flask-api:latest .
+          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/flask-api:latest .
 
       - name: Push the Docker image
         run: |
-          docker push gcr.io/your-gcp-project-id/flask-api:latest
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/flask-api:latest
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy flask-api --image gcr.io/your-gcp-project-id/flask-api:latest --region us-central1 --platform managed --allow-unauthenticated
+          gcloud run deploy flask-api --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/flask-api:latest --region us-central1 --platform managed --allow-unauthenticated

@@ -32,6 +32,72 @@ The project is organized into the following key directories and files:
 │    └── workflows
 │       └── deploy.yml                 # GitHub Actions workflows for deploying to cloud 
 ```
+# Project Brief: Data Engineering Team Activity
+
+## Overview
+Your task is to develop a simple end-to-end system that:
+- Trains a basic logistic regression model (using scikit-learn)
+- Serves the model via a Flask API
+- Logs API calls and predictions in a PostgreSQL database
+- Containerizes the components with Docker
+- Deploys the pipeline to a cloud platform (using free credits)
+- Develops API documentation (and optionally a Postman script) so other groups can use your API
+
+## Repository and Collaboration
+
+1. **Forking the Base Repository**
+   - One group should fork the provided base repository. This repo will serve as your project starting point.
+   - The main group member (team lead) should then add the other team members as collaborators to the group repository.
+
+2. **Cloning and Contributing**
+   - Each team member should clone the main group repository to their local machines.
+   - All initial contributions should be made directly into this single repository.
+   - Once you become comfortable with the workflow, experiment by having individual team members fork the group repository into their own personal repos.
+   - Practice making pull requests (PRs) from these forks. Each PR must be reviewed and approved by at least two team members before merging into the main repository.
+
+## Team Roles
+Assign roles based on the following suggestions:
+- **Model Developer:** Implements and trains the logistic regression model.
+- **API Developer:** Develops the Flask API (including a static HTML form and unit tests).
+- **Database Engineer:** Sets up and integrates PostgreSQL for logging.
+- **DevOps/CI-CD Engineer:** Handles Docker containerization, GitHub Actions for deployment, and ensures proper cloud deployment.
+- **Documentation Specialist (optional):** Develops API documentation and a Postman script to help other groups use your API.
+
+## Workflow
+- **Initial Development:** Work on the main repository by committing and pushing your changes.
+- **Experiment with Forking:** Once comfortable, try forking the repo, making changes, and submitting pull requests. This helps simulate a real-world multi-repository workflow.
+- **Code Review:** Every pull request should be reviewed by at least two team members. Use the review process to discuss improvements and ensure code quality.
+
+## Cloud Deployment
+- **Platform Choice:** Choose a cloud platform for deployment (GCP, AWS, or any platform offering free credits).
+- **Free Credits:** Use the free credits available, but be cautious of cost overruns.
+- **Security:** Make sure to follow best practices regarding credentials and resource permissions.
+- **Deployment Automation:** Use GitHub Actions (or another CI/CD tool) to automate the deployment process.
+
+## API Documentation and Postman Script
+- **Documentation:** Develop comprehensive API documentation that explains:
+  - Available endpoints (e.g., `/predict`)
+  - Expected input data and output format
+  - How to authenticate (if applicable)
+  - Example requests and responses
+- **Postman Script:** Optionally, create a Postman collection that contains:
+  - A script for testing the API endpoints.
+  - Pre-configured requests so other groups can easily import the collection and test your API.
+
+## Final Deliverables
+- A working system deployed on the cloud platform.
+- A fully documented API (with a README and additional documentation if needed).
+- A Postman collection file (optional) for easy API testing.
+- A summary of your workflow, including how you used forks, pull requests, and reviews to merge changes.
+
+---
+
+**Remember:**  
+- The main repository is your base. Use forks and PRs to experiment with collaborative workflows.
+- Ensure that you keep track of costs and follow best security practices during cloud deployment.
+- Good documentation is key—make it easy for other groups to understand and use your API.
+
+Good luck, and happy coding!
 
 ## Setup Instructions
 clone this repository
@@ -182,10 +248,28 @@ This will automatically:
 - Initialize the schema
 - Set up the required users and permissions
 
+Note, the use_database environment variable is set to false, so the database will not be created and the logs will not be saved to the database
+
+to run the server with the database enabled, run the following command
+```bash
+# find the container id running the api
+docker ps
+# stop the container
+docker stop <container_id>
+# run the container again with the database enabled
+docker run -p 5000:5000 -e DB_ENABLED=true <container_id>
+# or just change the value of the use_database environment variable to true in the docker-compose.yml file    
+```
+
 2. Manual Setup:
 ```bash
-# Connect to PostgreSQL
-psql -U postgres
+# Connect to PostgreSQL in the container
+# if using docker desktop then connect to a terminal for the running container
+
+# find the container id running the api
+docker ps
+docker exec -it <container_id> psql -U postgres
+
 
 # Create database
 CREATE DATABASE flask_logs;

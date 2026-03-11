@@ -12,5 +12,5 @@ COPY model/ model/
 COPY static/ static/
 
 # Expose the port and run the Flask app
-EXPOSE 5000
+EXPOSE 8080
 CMD ["python", "api/app.py"]

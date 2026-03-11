@@ -44,6 +44,7 @@ venv.bak/
 
 # Project specific
 *.pkl
+!model/logistic_model.pkl
 *.h5
 model/saved_models/
 logs/

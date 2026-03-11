@@ -360,6 +360,185 @@ docker push niallroche/data-engineering-mlops:latest
 - A GCP project.
 - A service account key for the GCP project.
 
+---
+
+### Deploying to Google Cloud Run (Web Console)
+
+This section explains how to deploy the ML model API to Google Cloud Run using the Google Cloud Web Console.
+
+#### Part 1 — Create a Google Cloud Account
+
+Open the Google Cloud Console: https://console.cloud.google.com
+
+Sign in using a Google account. If this is your first time using Google Cloud you will be prompted to start the free trial and enable billing. The free trial provides credits which are sufficient for this lab.
+
+#### Part 2 — Create a New Project
+
+Projects are the top-level container for all Google Cloud resources.
+
+1. Click the **Project Selector** in the top navigation bar
+2. Click **New Project**
+
+Enter:
+- **Project name:** `mlops-lab-group1`
+- **Organization:** leave blank
+- **Location:** No organization
+
+Click **Create**. After creation, make sure your new project is selected in the top menu.
+
+#### Part 3 — Enable Required APIs
+
+Navigate to **APIs & Services → Library** and enable the following APIs:
+
+| API | Purpose |
+|-----|---------|
+| **Cloud Run API** | Runs the containerised service |
+| **Artifact Registry API** | Stores container images |
+| **Cloud Build API** | Builds container images from source |
+| **Secret Manager API** *(optional)* | Secure storage for credentials/API keys |
+| **Vertex AI API** *(optional)* | Advanced ML model hosting |
+
+#### Part 4 — Create a Service Account
+
+Navigate to **IAM & Admin → Service Accounts** and click **Create Service Account**.
+
+Enter:
+- **Name:** `mlops-lab-sa`
+- **Description:** `Service account for MLOps lab deployment`
+
+Click **Create** and assign the following roles:
+- Cloud Run Admin
+- Artifact Registry Writer
+- Cloud Build Editor
+- Service Account User
+
+Click **Done**.
+
+#### Part 5 — Create an Artifact Registry
+
+Navigate to **Artifact Registry → Repositories** and click **Create Repository**.
+
+Fill in:
+- **Name:** `ml-models`
+- **Format:** Docker
+- **Mode:** Standard
+- **Region:** `europe-west2` (London)
+
+Click **Create**. The registry is now ready to store container images built by Cloud Build.
+
+#### Part 6 — Deploy the Service to Cloud Run
+
+Navigate to **Cloud Run → Create Service** and choose **Deploy from source repository**.
+
+If GitHub is not yet connected, click **Set up Cloud Build** and follow the prompts to connect your GitHub account.
+
+Once connected:
+- Select your repository (e.g. `data-engineering-mlops`)
+- Choose the branch: `main`
+- Select the folder containing the API (e.g. `api/`)
+
+#### Part 7 — Configure the Cloud Run Service
+
+| Setting | Value |
+|---------|-------|
+| **Service name** | `ensemble-gateway` |
+| **Region** | `europe-west2` |
+| **Authentication** | Allow unauthenticated |
+| **Port** | `8080` |
+| **Min instances** | `0` |
+| **Max instances** | `5` |
+| **CPU** | `1` |
+| **Memory** | `512 MB` |
+
+Click **Create**. Cloud Run will build the container image, push it to Artifact Registry, and deploy a new service revision. Deployment usually takes 1–2 minutes.
+
+#### Part 8 — Retrieve the Public API URL
+
+After deployment finishes, Cloud Run displays a **Service URL**, for example:
+
+```
+https://ensemble-gateway-abc123-ew2.a.run.app
+```
+
+If you are using FastAPI, the Swagger docs are available at:
+
+```
+https://SERVICE_URL/docs
+```
+
+#### Part 9 — Test the API Endpoint
+
+```bash
+export SERVICE_URL=https://ensemble-gateway-abc123-ew2.a.run.app
+
+curl -X POST "$SERVICE_URL/predict" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
+  -d '{"features": [5.1, 3.5, 1.4, 0.2]}'
+```
+
+Expected response:
+
+```json
+{
+  "prediction": 1,
+  "confidence": 0.83
+}
+```
+
+#### Troubleshooting
+
+**Container failed to start**
+
+Ensure the application listens on `0.0.0.0:8080`. Cloud Run sets the `PORT` environment variable automatically:
+
+```python
+import os
+port = int(os.environ.get("PORT", 8080))
+app.run(host="0.0.0.0", port=port)
+```
+
+**Model file not found**
+
+If you see `FileNotFoundError: model/logistic_model.pkl`, ensure the model file exists inside the container image. Your project structure should look like:
+
+```
+repo/
+├── api/
+│   └── app.py
+├── model/
+│   └── logistic_model.pkl
+└── Dockerfile
+```
+
+And the Dockerfile must copy the model directory:
+
+```dockerfile
+COPY . /app
+```
+
+**Verify application startup locally**
+
+Before deploying, test on the Cloud Run port:
+
+```bash
+PORT=8080 python api/app.py
+# or
+PORT=8080 uvicorn api.app:app --host 0.0.0.0 --port 8080
+```
+
+**scikit-learn version mismatch**
+
+If you see `'LogisticRegression' object has no attribute 'multi_class'`, the model was pickled with a different scikit-learn version than the one in `requirements.txt`. Retrain the model after installing the pinned version:
+
+```bash
+pip install scikit-learn==1.6.1
+python model/train_model.py
+```
+
+Commit the updated `logistic_model.pkl` and redeploy.
+
+---
 
 ## How to Deploy to AWS
 
